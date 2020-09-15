@@ -1,5 +1,6 @@
 # docker-gdal-oci
-Docker image for GDAL with OCI (Oracle) support
+
+> Docker image for GDAL with OCI (Oracle) support
 
 ## Use the prebuilt image
 
