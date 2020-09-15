@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 # Software versions
-ENV GDAL_VERSION 3.1.2
+ENV GDAL_VERSION 3.1.3
 ENV PROJ_VERSION 7.1.1
 ENV ORACLE_VERSION 19.8
 ENV POSTGRES_VERSION 12
@@ -19,7 +19,7 @@ RUN apt-get -y update && \
   # Install libs
   apt-get -y install \ 
     wget build-essential git cmake sqlite3 libsqlite3-dev libtiff-dev libcurl4-openssl-dev alien libaio1  \
-    postgis postgresql-${POSTGRES_VERSION}-postgis-${POSTGIS_VERSION} pkg-config libpq-dev
+    postgis postgresql-${POSTGRES_VERSION}-postgis-${POSTGIS_VERSION} pkg-config libpq-dev python3 python3-pip
 
 ENV INSTALL_DIR /opt/install
 RUN mkdir -p ${INSTALL_DIR}
@@ -64,4 +64,16 @@ RUN chown 1000:1000 configure && \
 WORKDIR /root
 RUN rm -rf ${INSTALL_DIR}
 
+# Update C env vars so compiler can find gdal
+ENV CPLUS_INCLUDE_PATH=/usr/local/include
+ENV C_INCLUDE_PATH=/usr/local/include
+
+RUN pip3 install numpy==1.19.2 \
+  && pip3 install GDAL==${GDAL_VERSION} --global-option=build_ext --global-option="-I/usr/local/include"
+
+RUN pip3 install autopep8
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+
 RUN apt-get -y autoremove build-essential wget git alien
+
